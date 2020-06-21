@@ -33,15 +33,23 @@ class TicTacToe:
     def run(self) -> None:
         while True:
             self.logger.debug(f"STATE: {self.board}")
-
             self.logger.info(self.draw_board())
+
             self.move()
-            if self.game_status():
+            if self.check_if_player_wins(self.player_char):
                 self.logger.info(self.draw_board())
                 self.logger.info('You won.')
                 return
 
+            if not self.available_positions():
+                self.logger.info('Draw.')
+                return
+
             self.ai_move()
+            if self.check_if_player_wins(self.ai_char):
+                self.logger.info(self.draw_board())
+                self.logger.info('You lost. Kind of impossible but...')
+                return
 
     def draw_board(self) -> str:
         board = "\n"
@@ -64,11 +72,11 @@ class TicTacToe:
             self.logger.info("1 to 9 only, try again")
             self.move()
 
-    def player_pattern(self) -> set:
-        return {item[0] for item in self.board.items() if item[1] == self.player_char}
+    def player_pattern(self, char) -> set:
+        return {item[0] for item in self.board.items() if item[1] == char}
 
-    def game_status(self) -> bool:
-        player_pattern = self.player_pattern()
+    def check_if_player_wins(self, char) -> bool:
+        player_pattern = self.player_pattern(char)
         for pattern in self.winning_patterns:
             if len(pattern - player_pattern) == 0:
                 return True
